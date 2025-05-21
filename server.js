@@ -39,7 +39,7 @@ app.get('/superheroes/search', async (req, res) => {
   if (!query || typeof query !== 'string') {
     return res.status(400).json({ error: 'Invalid query parameter' });
   }
-  logger.log('Searching for Heroes with query:', query);
+  logger.log(`Searching for Heroes with query: ${query}`);
 
   const heroes = heroesLib.HEROES_API.filter((hero) =>
     hero.name.toLowerCase().includes(query.toLowerCase())
@@ -60,13 +60,37 @@ app.get('/superheroes/pagination', async (req, res) => {
   const endIndex = page * limit;
   const heroes = heroesLib.HEROES_API.slice(startIndex, endIndex);
   const totalHeroes = heroesLib.HEROES_API.length;
+  let message = '';
+  logger.log(`Fetching heroes for page ${page} with limit ${limit}`);
 
+  if (page < 1 || limit < 1) {
+    message = 'Invalid page or limit';
+    logger.error(message);
+    return res.status(400).json({ error: message });
+  }
+  if (page > Math.ceil(totalHeroes / limit)) {
+    message = 'Page not found';
+    logger.error(message);
+    return res.status(404).json({ error: message });
+  }
+  if (limit > totalHeroes) {
+    message = 'Limit exceeds total heroes';
+    logger.error(message);
+    return res.status(400).json({ error: message });
+  }
+  if (startIndex > totalHeroes) {
+    message = 'Start index exceeds total heroes';
+    logger.error(message);
+    return res.status(404).json({ error: message });
+  }
   if (heroes.length > 0) {
-    res.json({ data: heroes, totalHeroes });
+    logger.log(`Found ${heroes.length} heroes`);
+    logger.log(`Total heroes: ${totalHeroes}`);
+    return res.json({ data: heroes, totalHeroes });
   } else {
     const message = 'No heroes found';
     logger.error(message);
-    res.status(404).json({ error: message });
+    return res.status(404).json({ error: message });
   }
 });
 
