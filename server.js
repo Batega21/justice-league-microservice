@@ -1,15 +1,13 @@
 const express = require('express');
-const axios = require('axios');
 const cors = require('cors');
+const logger = require('./logger')
 
 const app = express();
 const port = 3000;
 const heroesLib = require('./heroes');
 
 app.use(
-  cors({
-    origin: 'http://localhost:4200',
-  })
+  cors({ origin: 'http://localhost:4200' })
 );
 app.use('/img', express.static('./public/img'));
 
@@ -24,25 +22,34 @@ app.get('/superhero/:id', async (req, res) => {
 });
 
 app.get('/superheroes', async (req, res) => {
-  console.log('Fetching all superheroes');
+  logger.log('Fetching all superheroes');
   const heroes = heroesLib.HEROES_API;
   if (heroes) {
     res.json(heroes);
   } else {
-    res.status(404).json({ error: 'Heroes not found' });
+    const message = 'Heroes not found';
+    logger.error(message);
+    res.status(404).json({ error: message });
   }
 });
 
 app.get('/superheroes/search', async (req, res) => {
   const query = req.query.q;
-  console.log('Searching for Heroes with query:', query);
+  
+  if (!query || typeof query !== 'string') {
+    return res.status(400).json({ error: 'Invalid query parameter' });
+  }
+  logger.log('Searching for Heroes with query:', query);
+
   const heroes = heroesLib.HEROES_API.filter((hero) =>
     hero.name.toLowerCase().includes(query.toLowerCase())
   );
   if (heroes.length > 0) {
     res.json(heroes);
   } else {
-    res.status(404).json({ error: 'No heroes found' });
+    const message = 'No heroes found';
+    logger.error(message);
+    res.status(404).json({ error: message });
   }
 });
 
@@ -57,11 +64,12 @@ app.get('/superheroes/pagination', async (req, res) => {
   if (heroes.length > 0) {
     res.json({ data: heroes, totalHeroes });
   } else {
-    res.status(404).json({ error: 'No heroes found' });
+    const message = 'No heroes found';
+    logger.error(message);
+    res.status(404).json({ error: message });
   }
 });
 
-
 app.listen(port, () => {
-  console.log(`Proxy server listening on port ${port}`);
+  logger.debug(`Proxy server listening on port ${port}`);
 });
