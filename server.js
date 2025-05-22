@@ -11,13 +11,51 @@ app.use(
 );
 app.use('/img', express.static('./public/img'));
 
-app.get('/superhero/:id', async (req, res) => {
-  const characterId = req.params.id;
-  const hero = heroesLib.HEROES_API.find((hero) => hero.id == characterId);
+app.get('/superheroes/hero/:id', async (req, res) => {
+  const heroId = req.params.id;
+  const hero = heroesLib.HEROES_API.find((hero) => hero.id == heroId);
   if (hero) {
     res.json(hero);
   } else {
     res.status(404).json({ error: 'Hero not found' });
+  }
+});
+
+app.get('/superheroes/hero', async (req, res) => {
+  const heroName = req.query.name;
+  const heroNameDecoded = decodeURIComponent(heroName);
+  let message = '';
+  logger.log(`Fetching hero with name: ${heroNameDecoded}`);
+  if (!heroNameDecoded || typeof heroNameDecoded !== 'string') {
+    message = 'Invalid hero name';
+    logger.error(message);
+    return res.status(400).json({ error: message });
+  }
+  if (heroNameDecoded.length < 3) {
+    message = 'Hero name must be at least 3 characters long';
+    logger.error(message);
+    return res.status(400).json({ error: message });
+  }
+  if (heroNameDecoded.length > 50) {
+    message = 'Hero name must be less than 50 characters long';
+    logger.error(message);
+    return res.status(400).json({ error: message });
+  }
+  if (!/^[a-zA-Z0-9 ]+$/.test(heroNameDecoded)) {
+    message = 'Hero name can only contain alphanumeric characters and spaces';
+    logger.error(message);
+    return res.status(400).json({ error: message });
+  }
+
+  logger.log(`Searching for hero with name: ${heroNameDecoded}`);
+
+  const hero = heroesLib.HEROES_API.find((hero) => hero.name.toLowerCase() == heroNameDecoded.toLowerCase());
+  if (hero) {
+    res.json(hero);
+  } else {
+    message = 'Hero not found';
+    logger.error(message);
+    res.status(404).json({ error: message });
   }
 });
 
@@ -34,12 +72,13 @@ app.get('/superheroes', async (req, res) => {
 });
 
 app.get('/superheroes/search', async (req, res) => {
-  const query = req.query.q;
-  
+  const query = req.query.name;
+  logger.log(query);
+
   if (!query || typeof query !== 'string') {
     return res.status(400).json({ error: 'Invalid query parameter' });
   }
-  logger.log(`Searching for Heroes with query: ${query}`);
+  logger.log(`---- Searching for Heroes with query: ${query} -----`);
 
   const heroes = heroesLib.HEROES_API.filter((hero) =>
     hero.name.toLowerCase().includes(query.toLowerCase())
@@ -55,7 +94,7 @@ app.get('/superheroes/search', async (req, res) => {
 
 app.get('/superheroes/pagination', async (req, res) => {
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
+  const limit = parseInt(req.query.limit) || 9;
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
   const heroes = heroesLib.HEROES_API.slice(startIndex, endIndex);
@@ -91,6 +130,49 @@ app.get('/superheroes/pagination', async (req, res) => {
     const message = 'No heroes found';
     logger.error(message);
     return res.status(404).json({ error: message });
+  }
+});
+
+app.get('/superheroes/by-names', async (req, res) => {
+  const namesDecoded = decodeURIComponent(req.query.name);
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 6;
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+  let message = '';
+  logger.log(`Fetching heroes: ${namesDecoded}`);
+
+  if (!namesDecoded || typeof namesDecoded !== 'string') {
+    message = 'Invalid names parameter';
+    logger.error(message);
+    return res.status(400).json({ error: message });
+  }
+  if (namesDecoded.length < 3) {
+    message = 'Team name must be at least 3 characters long';
+    logger.error(message);
+    return res.status(400).json({ error: message });
+  }
+  if (namesDecoded.length > 100) {
+    message = 'The hero list must be less than 100 characters long';
+    logger.error(message);
+    return res.status(400).json({ error: message });
+  }
+
+  const searchNames = namesDecoded.split(',');
+  const heroesMatched = heroesLib.HEROES_API.filter((hero) =>
+    searchNames.some((name) => hero.name.toLowerCase() === name.toLowerCase())
+  );
+  const heroes = heroesMatched.slice(startIndex, endIndex);
+  const totalHeroes = heroesLib.HEROES_API.length;
+
+  if (heroes.length > 0) {
+    logger.log(`Found ${heroes.length} heroes`);
+    logger.log(`Total heroes: ${totalHeroes}`);
+    return res.json({ data: heroes, totalHeroes });
+  } else {
+    message = 'No heroes found';
+    logger.error(message);
+    res.status(404).json({ error: message });
   }
 });
 
