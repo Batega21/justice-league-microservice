@@ -1,26 +1,18 @@
 const express = require('express');
 const cors = require('cors');
-const logger = require('./logger')
+const logger = require('./logger');
+const bodyParser = require('body-parser');
 
 const app = express();
-const port = 3000;
-const heroesLib = require('./heroes');
+const port = process.env.PORT || 3000;
+const { readHeroesFromFile, writeHeroesToFile } = require('./helpers/file-manager');
 
-app.use(
-  cors({ origin: 'http://localhost:4200' })
-);
+app.use(cors({ origin: 'http://localhost:4200' }));
 app.use('/img', express.static('./public/img'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/superheroes/hero/:id', async (req, res) => {
-  const heroId = req.params.id;
-  const hero = heroesLib.HEROES_API.find((hero) => hero.id == heroId);
-  if (hero) {
-    res.json(hero);
-  } else {
-    res.status(404).json({ error: 'Hero not found' });
-  }
-});
-
+// Endpoint to fetch a superhero by name - getHeroByName(name: string)
 app.get('/superheroes/hero', async (req, res) => {
   const heroName = req.query.name;
   const heroNameDecoded = decodeURIComponent(heroName);
@@ -49,7 +41,8 @@ app.get('/superheroes/hero', async (req, res) => {
 
   logger.log(`Searching for hero with name: ${heroNameDecoded}`);
 
-  const hero = heroesLib.HEROES_API.find((hero) => hero.name.toLowerCase() == heroNameDecoded.toLowerCase());
+  const heroes = await readHeroesFromFile();
+  const hero = heroes.find((hero) => hero.name.toLowerCase() == heroNameDecoded.toLowerCase());
   if (hero) {
     res.json(hero);
   } else {
@@ -59,18 +52,7 @@ app.get('/superheroes/hero', async (req, res) => {
   }
 });
 
-app.get('/superheroes', async (req, res) => {
-  logger.log('Fetching all superheroes');
-  const heroes = heroesLib.HEROES_API;
-  if (heroes) {
-    res.json(heroes);
-  } else {
-    const message = 'Heroes not found';
-    logger.error(message);
-    res.status(404).json({ error: message });
-  }
-});
-
+// Endpoint to search superheroes by name - getHeroesByName()
 app.get('/superheroes/search', async (req, res) => {
   const query = req.query.name;
   logger.log(query);
@@ -80,11 +62,12 @@ app.get('/superheroes/search', async (req, res) => {
   }
   logger.log(`---- Searching for Heroes with query: ${query} -----`);
 
-  const heroes = heroesLib.HEROES_API.filter((hero) =>
+  const heroes = await readHeroesFromFile();
+  const heroesByName = heroes.filter((hero) =>
     hero.name.toLowerCase().includes(query.toLowerCase())
   );
-  if (heroes.length > 0) {
-    res.json(heroes);
+  if (heroesByName.length > 0) {
+    res.json(heroesByName);
   } else {
     const message = 'No heroes found';
     logger.error(message);
@@ -97,8 +80,9 @@ app.get('/superheroes/pagination', async (req, res) => {
   const limit = parseInt(req.query.limit) || 9;
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
-  const heroes = heroesLib.HEROES_API.slice(startIndex, endIndex);
-  const totalHeroes = heroesLib.HEROES_API.length;
+  const heroes = await readHeroesFromFile();
+  const heroesPaginated = heroes.slice(startIndex, endIndex);
+  const totalHeroes = heroes.length;
   let message = '';
   logger.log(`Fetching heroes for page ${page} with limit ${limit}`);
 
@@ -122,10 +106,10 @@ app.get('/superheroes/pagination', async (req, res) => {
     logger.error(message);
     return res.status(404).json({ error: message });
   }
-  if (heroes.length > 0) {
-    logger.log(`Found ${heroes.length} heroes`);
+  if (heroesPaginated.length > 0) {
+    logger.log(`Found ${heroesPaginated.length} heroes`);
     logger.log(`Total heroes: ${totalHeroes}`);
-    return res.json({ data: heroes, totalHeroes });
+    return res.json({ data: heroesPaginated, totalHeroes });
   } else {
     const message = 'No heroes found';
     logger.error(message);
@@ -159,20 +143,129 @@ app.get('/superheroes/by-names', async (req, res) => {
   }
 
   const searchNames = namesDecoded.split(',');
-  const heroesMatched = heroesLib.HEROES_API.filter((hero) =>
+  const heroes = await readHeroesFromFile();
+  const heroesMatched = heroes.filter((hero) =>
     searchNames.some((name) => hero.name.toLowerCase() === name.toLowerCase())
   );
-  const heroes = heroesMatched.slice(startIndex, endIndex);
-  const totalHeroes = heroesLib.HEROES_API.length;
+  const heroesByName = heroesMatched.slice(startIndex, endIndex);
+  const totalHeroes = heroes.length;
 
-  if (heroes.length > 0) {
-    logger.log(`Found ${heroes.length} heroes`);
+  if (heroesByName.length > 0) {
+    logger.log(`Found ${heroesByName.length} heroes`);
     logger.log(`Total heroes: ${totalHeroes}`);
-    return res.json({ data: heroes, totalHeroes });
+    return res.json({ data: heroesByName, totalHeroes });
   } else {
     message = 'No heroes found';
     logger.error(message);
     res.status(404).json({ error: message });
+  }
+});
+
+// CRUD operations for heroes
+// Endpoint to Create a new superhero - addHero(hero: Hero)
+app.post('/superheroes', async (req, res) => {
+  try {
+    const heroes = await readHeroesFromFile();
+    const newHero = req.body;
+    logger.log("🚀 Adding a newHero:", newHero);
+    if (!newHero || !newHero.name || !newHero.realName) {
+      return res.status(400).json({ error: 'Name and Real Name are required' });
+    }
+    newHero.id = heroesLib.HEROES_API.length + 1;
+    heroes.push(newHero);
+    await writeHeroesToFile(heroes);
+    logger.log(`Added new hero: ${newHero.name}`);
+    res.status(201).json(newHero);    
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to add hero' });
+    logger.error('Error adding hero:', error);
+  }
+});
+
+// Endpoint to Read all superheroes - getHeroes()
+app.get('/superheroes', async (req, res) => {
+  logger.log('Fetching all superheroes');
+  const heroes = await readHeroesFromFile();
+  if (!heroes || heroes.length === 0) {
+    const message = 'Heroes not found';
+    logger.error(message);
+    res.status(404).json({ error: message });
+  } else {
+    res.json(heroes);
+  }
+});
+
+// Endpoint to Read a superhero by ID - getHeroById(id: string)
+app.get('/superheroes/hero/:id', async (req, res) => {
+  const heroId = req.params.id;
+  const heroes = await readHeroesFromFile();
+  const hero = heroes.find((hero) => hero.id === parseInt(heroId));
+  logger.log(`Fetching hero with ID: ${heroId}`);
+  if (!heroId || isNaN(heroId)) {
+    return res.status(400).json({ error: 'Invalid hero ID' });
+  }
+  if (heroId < 1) {
+    return res.status(400).json({ error: 'Hero ID must be a positive integer' });
+  }
+  if (heroId > heroes.length) {
+    return res.status(404).json({ error: 'Hero not found' });
+  }
+  if (hero) {
+    logger.log(`Found hero: ${hero.name}`);
+    res.json(hero);
+  } else {
+    const message = 'Hero not found';
+    logger.error(message);
+    res.status(404).json({ error: message });
+  }
+});
+
+
+// Endpoint to Update a superhero by ID - updateHero(id: string, hero: Hero)
+app.put('/superheroes/:id', async (req, res) => {
+  const heroId = parseInt(req.params.id);
+  const heroNewData = { ...req.body };
+  const heroes = await readHeroesFromFile();
+  const index = heroes.findIndex((hero) => hero.id === heroId);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Hero not found' });
+  }
+  if (!heroNewData || !heroNewData.name || !heroNewData.realName) {
+    return res.status(400).json({ error: 'Name and Real Name are required' });
+  }
+  if (heroNewData.id && heroNewData.id !== heroId) {
+    return res.status(400).json({ error: 'ID cannot be changed' });
+  }
+  const updatedHero = { ...heroes[index], ...heroNewData, id: heroId };
+  logger.log(`Updated hero with ID: ${heroId}`);
+  res.json(updatedHero);
+});
+
+// Endpoint to Delete a superhero by ID - deleteHero(id: string)
+app.delete('/superheroes/:id', async (req, res) => {
+  try {
+    let heroes = await readHeroesFromFile();
+    const heroId = parseInt(req.params.id);
+    logger.log(`Deleting hero with ID: ${heroId}`);
+    if (!heroId || isNaN(heroId)) {
+      return res.status(400).json({ error: 'Invalid hero ID' });
+    }
+    if (heroId < 1) {
+      return res.status(400).json({ error: 'Hero ID must be a positive integer' });
+    }
+
+    const index = heroes.findIndex((hero) => hero.id === heroId);
+    if (index === -1) {
+      return res.status(404).json({ error: 'Hero not found' });
+    } else {
+      const deletedHero = heroes.splice(index, 1)[0];
+      await writeHeroesToFile(heroes);
+      logger.log(`Deleted hero: ${deletedHero.name}`);
+      res.json({ message: `Hero with ID ${heroId} deleted successfully`, hero: deletedHero });
+    }
+  } catch (error) {
+    logger.error('Error deleting hero:', error);
+    res.status(500).json({ error: 'Failed to delete hero' });
   }
 });
 
