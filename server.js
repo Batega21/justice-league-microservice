@@ -148,7 +148,7 @@ app.get('/superheroes/by-names', async (req, res) => {
     searchNames.some((name) => hero.name.toLowerCase() === name.toLowerCase())
   );
   const heroesByName = heroesMatched.slice(startIndex, endIndex);
-  const totalHeroes = heroes.length;
+  const totalHeroes = heroesByName.length;
 
   if (heroesByName.length > 0) {
     logger.log(`Found ${heroesByName.length} heroes`);
@@ -198,27 +198,16 @@ app.get('/superheroes', async (req, res) => {
 // Endpoint to Read a superhero by ID - getHeroById(id: string)
 app.get('/superheroes/:id', async (req, res) => {
   const heroId = parseInt(req.params.id);
-  if (!heroId || typeof heroId !== 'number') {
-    const message = 'Invalid hero ID';
+  if (isNaN(heroId) || heroId < 1) {
+    const message = heroId < 1 ? 'Hero ID must be a positive integer' : 'Invalid hero ID';
     logger.error(message);
     return res.status(400).json({ error: message });
-  }
-  if (isNaN(heroId)) {
-    const message = 'Invalid hero ID';
-    logger.error(message);
-    return res.status(400).json({ error: message });
-  }
-  if (!heroId || isNaN(heroId)) {
-    return res.status(400).json({ error: 'Invalid hero ID' });
   }
 
   const heroes = await readHeroesFromFile();
   const hero = heroes.find((hero) => hero.id === parseInt(heroId));
   logger.log(`Fetching hero with ID: ${heroId}`);
-
-  if (heroId < 1) {
-    return res.status(400).json({ error: 'Hero ID must be a positive integer' });
-  }
+  
   if (heroId > heroes.length) {
     return res.status(404).json({ error: 'Hero not found' });
   }
