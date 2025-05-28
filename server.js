@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const logger = require('./logger');
-const bodyParser = require('body-parser');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -9,8 +8,7 @@ const { readHeroesFromFile, writeHeroesToFile } = require('./helpers/file-manage
 
 app.use(cors({ origin: 'http://localhost:4200' }));
 app.use('/img', express.static('./public/img'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Endpoint to fetch a superhero by name - getHeroByName(name: string)
 app.get('/superheroes/hero', async (req, res) => {
@@ -148,7 +146,7 @@ app.get('/superheroes/by-names', async (req, res) => {
     searchNames.some((name) => hero.name.toLowerCase() === name.toLowerCase())
   );
   const heroesByName = heroesMatched.slice(startIndex, endIndex);
-  const totalHeroes = heroesByName.length;
+  const totalHeroes = heroesMatched.length;
 
   if (heroesByName.length > 0) {
     logger.log(`Found ${heroesByName.length} heroes`);
@@ -208,7 +206,7 @@ app.get('/superheroes/:id', async (req, res) => {
   }
 
   const heroes = await readHeroesFromFile();
-  const hero = heroes.find((hero) => hero.id === parseInt(heroId));
+  const hero = heroes.find((hero) => hero.id === heroId);
   logger.log(`Fetching hero with ID: ${heroId}`);
 
   if (hero) {

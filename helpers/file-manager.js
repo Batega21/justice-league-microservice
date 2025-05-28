@@ -1,15 +1,15 @@
 const fs = require('fs').promises;
 const path = require('path');
-const heroesFilePath = path.join(__dirname, 'heroes-data.json');
+const heroesFilePath = path.join(__dirname, '../heroes-data.json');
 
 const readHeroesFromFile = async () => {
   try {
     const data = await fs.readFile(heroesFilePath, 'utf8');
-    const heroes = JSON.parse(data);
     if (data.trim() === '') {
       console.warn('Heroes file is empty, returning an empty array');
       return [];
     }
+    const heroes = JSON.parse(data);
     return heroes;
   } catch (error) {
     if (error.code === 'ENOENT') {
