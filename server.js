@@ -171,7 +171,10 @@ app.post('/superheroes', async (req, res) => {
     if (!newHero || !newHero.name || !newHero.realName) {
       return res.status(400).json({ error: 'Name and Real Name are required' });
     }
-    newHero.id = heroes.length + 1;
+    
+    const maxId = heroes.reduce((max, hero) => hero.id > max ? hero.id : max, 0);
+    newHero.id = maxId + 1;
+
     heroes.push(newHero);
     await writeHeroesToFile(heroes);
     logger.log(`Added new hero: ${newHero.name}`);
@@ -207,10 +210,7 @@ app.get('/superheroes/:id', async (req, res) => {
   const heroes = await readHeroesFromFile();
   const hero = heroes.find((hero) => hero.id === parseInt(heroId));
   logger.log(`Fetching hero with ID: ${heroId}`);
-  
-  if (heroId > heroes.length) {
-    return res.status(404).json({ error: 'Hero not found' });
-  }
+
   if (hero) {
     logger.log(`Found hero: ${hero.name}`);
     res.json(hero);
