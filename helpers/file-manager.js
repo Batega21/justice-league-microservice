@@ -1,6 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
-const heroesFilePath = path.join(__dirname, 'heroes.json');
+const heroesFilePath = path.join(__dirname, 'heroes-data.json');
 
 const readHeroesFromFile = async () => {
   try {

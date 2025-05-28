@@ -171,7 +171,7 @@ app.post('/superheroes', async (req, res) => {
     if (!newHero || !newHero.name || !newHero.realName) {
       return res.status(400).json({ error: 'Name and Real Name are required' });
     }
-    newHero.id = heroesLib.HEROES_API.length + 1;
+    newHero.id = heroes.length + 1;
     heroes.push(newHero);
     await writeHeroesToFile(heroes);
     logger.log(`Added new hero: ${newHero.name}`);
@@ -196,14 +196,26 @@ app.get('/superheroes', async (req, res) => {
 });
 
 // Endpoint to Read a superhero by ID - getHeroById(id: string)
-app.get('/superheroes/hero/:id', async (req, res) => {
-  const heroId = req.params.id;
-  const heroes = await readHeroesFromFile();
-  const hero = heroes.find((hero) => hero.id === parseInt(heroId));
-  logger.log(`Fetching hero with ID: ${heroId}`);
+app.get('/superheroes/:id', async (req, res) => {
+  const heroId = parseInt(req.params.id);
+  if (!heroId || typeof heroId !== 'number') {
+    const message = 'Invalid hero ID';
+    logger.error(message);
+    return res.status(400).json({ error: message });
+  }
+  if (isNaN(heroId)) {
+    const message = 'Invalid hero ID';
+    logger.error(message);
+    return res.status(400).json({ error: message });
+  }
   if (!heroId || isNaN(heroId)) {
     return res.status(400).json({ error: 'Invalid hero ID' });
   }
+
+  const heroes = await readHeroesFromFile();
+  const hero = heroes.find((hero) => hero.id === parseInt(heroId));
+  logger.log(`Fetching hero with ID: ${heroId}`);
+
   if (heroId < 1) {
     return res.status(400).json({ error: 'Hero ID must be a positive integer' });
   }
@@ -237,6 +249,8 @@ app.put('/superheroes/:id', async (req, res) => {
     return res.status(400).json({ error: 'ID cannot be changed' });
   }
   const updatedHero = { ...heroes[index], ...heroNewData, id: heroId };
+  heroes[index] = updatedHero;
+  await writeHeroesToFile(heroes);
   logger.log(`Updated hero with ID: ${heroId}`);
   res.json(updatedHero);
 });
