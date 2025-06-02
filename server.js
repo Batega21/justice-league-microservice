@@ -4,7 +4,7 @@ const logger = require('./logger');
 
 const app = express();
 const port = process.env.PORT || 3000;
-const { readHeroesFromFile, writeHeroesToFile } = require('./helpers/file-manager');
+const { readHeroesFromFile, writeHeroesToFile, heroesOriginalData } = require('./helpers/file-manager');
 
 app.use(cors({ origin: 'http://localhost:4200' }));
 app.use('/img', express.static('./public/img'));
@@ -80,34 +80,34 @@ app.get('/superheroes/pagination', async (req, res) => {
   const endIndex = page * limit;
   const heroes = await readHeroesFromFile();
   const heroesPaginated = heroes.slice(startIndex, endIndex);
-  const totalHeroes = heroes.length;
+  const heroesCount = heroes.length;
   let message = '';
-  logger.log(`Fetching heroes for page ${page} with limit ${limit}`);
+  logger.log(`Fetching heroes for page ${page} with limit ${limit} - ${new Date().toISOString()}`);
 
   if (page < 1 || limit < 1) {
     message = 'Invalid page or limit';
     logger.error(message);
     return res.status(400).json({ error: message });
   }
-  if (page > Math.ceil(totalHeroes / limit)) {
+  if (page > Math.ceil(heroesCount / limit)) {
     message = 'Page not found';
     logger.error(message);
     return res.status(404).json({ error: message });
   }
-  if (limit > totalHeroes) {
+  if (limit > heroesCount) {
     message = 'Limit exceeds total heroes';
     logger.error(message);
     return res.status(400).json({ error: message });
   }
-  if (startIndex > totalHeroes) {
+  if (startIndex > heroesCount) {
     message = 'Start index exceeds total heroes';
     logger.error(message);
     return res.status(404).json({ error: message });
   }
   if (heroesPaginated.length > 0) {
     logger.log(`Found ${heroesPaginated.length} heroes`);
-    logger.log(`Total heroes: ${totalHeroes}`);
-    return res.json({ data: heroesPaginated, totalHeroes });
+    logger.log(`Total heroes: ${heroesCount}`);
+    return res.json({ heroes: heroesPaginated, heroesCount });
   } else {
     const message = 'No heroes found';
     logger.error(message);
@@ -151,7 +151,7 @@ app.get('/superheroes/by-names', async (req, res) => {
   if (heroesByName.length > 0) {
     logger.log(`Found ${heroesByName.length} heroes`);
     logger.log(`Total heroes: ${totalHeroes}`);
-    return res.json({ data: heroesByName, totalHeroes });
+    return res.json({ heroes: heroesByName, totalHeroes });
   } else {
     message = 'No heroes found';
     logger.error(message);
@@ -267,6 +267,23 @@ app.delete('/superheroes/:id', async (req, res) => {
   } catch (error) {
     logger.error('Error deleting hero:', error);
     res.status(500).json({ error: 'Failed to delete hero' });
+  }
+});
+
+// Endpoint to reset the heroes data from backup JSON file - resetHeroes()
+app.get('/superheroes/reset', async (req, res) => {
+  logger.log('Heroes data has been reset successfully');
+  try {
+    const heroes = await heroesOriginalData();
+    if (heroes.length === 0) {
+      return res.status(404).json({ error: 'No heroes Data to reset' });
+    }
+    await writeHeroesToFile(heroes);
+    logger.log('Heroes data has been reset successfully');
+    res.json({ heroes: heroes, heroesCount: heroes.length });
+  } catch (error) {
+    logger.error('Error resetting heroes:', error);
+    res.status(500).json({ error: 'Failed to reset heroes' });
   }
 });
 

@@ -19,7 +19,7 @@
   },
   {
     "id": 2,
-    "name": "Batman V",
+    "name": "Batman",
     "realName": "Bruce Wayne",
     "alias": "The Dark Knight",
     "alignment": "Hero",
@@ -123,21 +123,38 @@
   },
   {
     "id": 8,
-    "name": "Martian Manhunter V",
-    "realName": "Jonz Jonzz",
+    "name": "Martian Manhunter",
+    "realName": "J\"onn J\"onzz",
     "alias": "The Martian Detective",
+    "alignment": "Hero",
+    "team": "Justice League",
+    "powers": [
+      "Telepathy",
+      "Shape-Shifting",
+      "Invisibility",
+      "Flight",
+      "Super Strength"
+    ],
+    "origin": "Mars",
+    "firstAppearance": "Detective Comics #225 (1955)",
+    "imageUrl": "/img/martian_manhunter.png"
+  },
+  {
+    "id": 9,
+    "name": "Supergirl",
+    "realName": "Kara Zor-El",
+    "alias": "Superman's Cousin",
     "alignment": "Hero",
     "team": "Justice League",
     "powers": [
       "Super Strength",
       "Flight",
-      "Telepathy",
-      "Shape-Shifting",
-      "Invisibility"
+      "X-Ray Vision",
+      "Heat Vision"
     ],
-    "origin": "Mars",
-    "firstAppearance": "Detective Comics #225 (1955)",
-    "imageUrl": "/img/martian_manhunter.png"
+    "origin": "Krypton",
+    "firstAppearance": "Superman/Batman #8 (May, 2004)",
+    "imageUrl": "/img/supergirl.png"
   },
   {
     "id": 10,
@@ -220,59 +237,5 @@
     "origin": "Thanagar",
     "firstAppearance": "Flash Comics #1 (1940)",
     "imageUrl": "/img/hawkman.png"
-  },
-  {
-    "name": "Vigilante",
-    "realName": "Tester QAr",
-    "alias": "QA painkiller",
-    "alignment": "heroes",
-    "team": "titans",
-    "powers": [
-      "X-Ray Vision",
-      "Genius Intellect",
-      "Martial Arts",
-      "Stealth",
-      "High-Tech Gadgets",
-      "Combat Skills",
-      "Hand-to-Hand Combat",
-      "Gadgets",
-      "Acrobatics"
-    ],
-    "origin": "Earth",
-    "firstAppearance": "First Quarter",
-    "imageUrl": "/img/hero-placeholder.png",
-    "id": 16
-  },
-  {
-    "name": "Super Mom",
-    "realName": "Daniela",
-    "alias": "Mami",
-    "alignment": "heroes",
-    "team": "justice",
-    "powers": [
-      "Super Strength",
-      "Flight",
-      "X-Ray Vision"
-    ],
-    "origin": "Earth",
-    "firstAppearance": "1986",
-    "imageUrl": "/img/hero-placeholder.png",
-    "id": 18
-  },
-  {
-    "name": "TESTTT",
-    "realName": "Some tester",
-    "alias": "LKJLKJLK",
-    "alignment": "heroes",
-    "team": "justice",
-    "powers": [
-      "Super Speed",
-      "Accelerated Healing",
-      "Force Fields"
-    ],
-    "origin": "Earth",
-    "firstAppearance": "123456 asdasd",
-    "imageUrl": "/img/hero-placeholder.png",
-    "id": 19
   }
 ]
