@@ -271,7 +271,7 @@ app.delete('/superheroes/:id', async (req, res) => {
 });
 
 // Endpoint to reset the heroes data from backup JSON file - resetHeroes()
-app.get('/superheroes/reset', async (req, res) => {
+app.post('/superheroes/reset', async (req, res) => {
   logger.log('Resetting heroes data from backup file');
   try {
     const heroes = await heroesOriginalData();
