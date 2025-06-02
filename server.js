@@ -146,12 +146,12 @@ app.get('/superheroes/by-names', async (req, res) => {
     searchNames.some((name) => hero.name.toLowerCase() === name.toLowerCase())
   );
   const heroesByName = heroesMatched.slice(startIndex, endIndex);
-  const totalHeroes = heroesMatched.length;
+  const heroesCount = heroesMatched.length;
 
   if (heroesByName.length > 0) {
     logger.log(`Found ${heroesByName.length} heroes`);
-    logger.log(`Total heroes: ${totalHeroes}`);
-    return res.json({ heroes: heroesByName, totalHeroes });
+    logger.log(`Total heroes: ${heroesCount}`);
+    return res.json({ heroes: heroesByName, heroesCount });
   } else {
     message = 'No heroes found';
     logger.error(message);
@@ -272,7 +272,7 @@ app.delete('/superheroes/:id', async (req, res) => {
 
 // Endpoint to reset the heroes data from backup JSON file - resetHeroes()
 app.get('/superheroes/reset', async (req, res) => {
-  logger.log('Heroes data has been reset successfully');
+  logger.log('Resetting heroes data from backup file');
   try {
     const heroes = await heroesOriginalData();
     if (heroes.length === 0) {
