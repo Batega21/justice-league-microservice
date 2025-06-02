@@ -1,6 +1,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 const heroesFilePath = path.join(__dirname, '../heroes-data.json');
+const heroesOriginalFilePath = path.join(__dirname, '../heroes-data-backup.json');
 const logger = require('../logger');
 
 const readHeroesFromFile = async () => {
@@ -36,7 +37,18 @@ const writeHeroesToFile = async (heroes) => {
   }
 };
 
+const heroesOriginalData = async () => {
+  try {
+    const data = await fs.readFile(heroesOriginalFilePath, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    logger.error('Error reading original heroes data:', error);
+    throw error;
+  }
+}
+
 module.exports = {
   readHeroesFromFile,
-  writeHeroesToFile
+  writeHeroesToFile,
+  heroesOriginalData
 };
