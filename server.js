@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const logger = require('./logger');
+let counter = 0;
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -74,6 +75,7 @@ app.get('/superheroes/search', async (req, res) => {
 });
 
 app.get('/superheroes/pagination', async (req, res) => {
+  logger.log(`Fetching heroes with pagination ${counter}`);
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 9;
   const startIndex = (page - 1) * limit;
@@ -105,8 +107,10 @@ app.get('/superheroes/pagination', async (req, res) => {
     return res.status(404).json({ error: message });
   }
   if (heroesPaginated.length > 0) {
+    counter++;
     logger.log(`Found ${heroesPaginated.length} heroes`);
     logger.log(`Total heroes: ${heroesCount}`);
+    logger.log(`Endpoint called ${counter} times`);
     return res.json({ heroes: heroesPaginated, heroesCount });
   } else {
     const message = 'No heroes found';
@@ -166,14 +170,15 @@ app.post('/superheroes', async (req, res) => {
     const heroes = await readHeroesFromFile();
     const newHero = req.body;
     logger.log("🚀 Adding a newHero:", newHero);
+    logger.log(`API called - ${counter} times`);
     if (!newHero || !newHero.name || !newHero.realName) {
-      return res.status(400).json({ error: 'Name and Real Name are required' });
+      return res.status(400).json({ error: 'Name and Real name properties are required' });
     }
     
     const maxId = heroes.reduce((max, hero) => hero.id > max ? hero.id : max, 0);
     newHero.id = maxId + 1;
 
-    heroes.push(newHero);
+    heroes.unshift(newHero);
     await writeHeroesToFile(heroes);
     logger.log(`Added new hero: ${newHero.name}`);
     res.status(201).json(newHero);    
