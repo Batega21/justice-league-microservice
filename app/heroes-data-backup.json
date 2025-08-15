@@ -237,5 +237,211 @@
     "origin": "Thanagar",
     "firstAppearance": "Flash Comics #1 (1940)",
     "imageUrl": "/img/hawkman.png"
+  },
+  {
+    "id": 15,
+    "name": "Batgirl",
+    "realName": "Barbara Gordon",
+    "alias": "The Dark Knight\"s Protégé",
+    "alignment": "Hero",
+    "team": "Bat Family",
+    "powers": [
+      "Martial Arts",
+      "Hacking",
+      "Gadgets",
+      "Acrobatics"
+    ],
+    "origin": "Gotham City",
+    "firstAppearance": "Detective Comics #139 (1961)",
+    "imageUrl": "/img/batgirl.png"
+  },
+  {
+    "id": 16,
+    "name": "Nightwing",
+    "realName": "Richard \"Dick\" Grayson",
+    "alias": "The Original Robin",
+    "alignment": "Hero",
+    "team": "Titans",
+    "powers": [
+      "Martial Arts",
+      "Acrobatics",
+      "Gadgets",
+      "Leadership"
+    ],
+    "origin": "Gotham City",
+    "firstAppearance": "Detective Comics #43 (1984)",
+    "imageUrl": "/img/nightwing.png"
+  },
+  {
+    "id": 17,
+    "name": "Damian Wayne",
+    "realName": "Damian Wayne",
+    "alias": "Robin",
+    "alignment": "Hero",
+    "team": "Bat Family",
+    "powers": [
+      "Martial Arts",
+      "Stealth",
+      "Gadgets",
+      "Acrobatics"
+    ],
+    "origin": "Gotham City",
+    "firstAppearance": "Batman #655 (2006)",
+    "imageUrl": "/img/damian_wayne.png"
+  },
+  {
+    "id": 18,
+    "name": "Jon Kent",
+    "realName": "Jonathan Samuel Kent",
+    "alias": "Superboy",
+    "alignment": "Hero",
+    "team": "Titans",
+    "powers": [
+      "Super Strength",
+      "Flight",
+      "Heat Vision",
+      "X-Ray Vision",
+      "Invulnerability"
+    ],
+    "origin": "Earth",
+    "firstAppearance": "Convergence: Superman #2 (2015)",
+    "imageUrl": "/img/jon_kent.png"
+  },
+  {
+    "id": 19,
+    "name": "Krypto",
+    "realName": "Krypto",
+    "alias": "Superdog",
+    "alignment": "Hero",
+    "team": "Justice League",
+    "powers": [
+      "Super Strength",
+      "Flight",
+      "Enhanced Senses",
+      "Loyalty"
+    ],
+    "origin": "Krypton",
+    "firstAppearance": "Adventure Comics #210 (1955)",
+    "imageUrl": "/img/krypto.png"
+  },
+  {
+    "id": 20,
+    "name": "Superboy",
+    "realName": "Kon-El",
+    "alias": "Conner Kent",
+    "alignment": "Hero",
+    "team": "Titans",
+    "powers": [
+      "Super Strength",
+      "Flight",
+      "Heat Vision",
+      "X-Ray Vision",
+      "Invulnerability"
+    ],
+    "origin": "Earth",
+    "firstAppearance": "More Fun Comics #101 (1945)",
+    "imageUrl": "/img/superboy.png"
+  },
+  {
+    "id": 21,
+    "name": "Blue Beetle",
+    "realName": "Jaime Reyes",
+    "alias": "The Blue Beetle",
+    "alignment": "Hero",
+    "team": "Titans",
+    "powers": [
+      "Alien Technology",
+      "Flight",
+      "Energy Blasts",
+      "Enhanced Strength"
+    ],
+    "origin": "El Paso, Texas",
+    "firstAppearance": "Infinite Crisis #3 (2006)",
+    "imageUrl": "/img/blue_beetle.png"
+  },
+  {
+    "id": 22,
+    "name": "Shazam",
+    "realName": "Billy Batson",
+    "alias": "The Big Red Cheese",
+    "alignment": "Hero",
+    "team": "Justice League",
+    "powers": [
+      "Super Strength",
+      "Flight",
+      "Lightning Manipulation",
+      "Invulnerability"
+    ],
+    "origin": "Fawcett City",
+    "firstAppearance": "Whiz Comics #2 (1940)",
+    "imageUrl": "/img/shazam.png"
+  },
+  {
+    "id": 23,
+    "name": "Doctor Fate",
+    "realName": "Kent Nelson",
+    "alias": "Lord of Order",
+    "alignment": "Hero",
+    "team": "Justice Society of America",
+    "powers": [
+      "Magic",
+      "Flight",
+      "Telekinesis",
+      "Telepathy"
+    ],
+    "origin": "Nabu's Realm",
+    "firstAppearance": "More Fun Comics #55 (1940)",
+    "imageUrl": "/img/doctor_fate.png"
+  },
+  {
+    "id": 24,
+    "name": "Hawkgirl",
+    "realName": "Shiera Sanders Hall",
+    "alias": "Winged Warrior",
+    "alignment": "Hero",
+    "team": "Justice League",
+    "powers": [
+      "Flight",
+      "Super Strength",
+      "Combat Skills",
+      "Regeneration"
+    ],
+    "origin": "Thanagar",
+    "firstAppearance": "Flash Comics #1 (1940)",
+    "imageUrl": "/img/hawkgirl.png"
+  },
+  {
+    "id": 25,
+    "name": "Zatanna",
+    "realName": "Zatanna Zatara",
+    "alias": "Mistress of Magic",
+    "alignment": "Hero",
+    "team": "Justice League Dark",
+    "powers": [
+      "Magic",
+      "Illusion Casting",
+      "Telepathy",
+      "Teleportation"
+    ],
+    "origin": "New York City",
+    "firstAppearance": "Hawkman #4 (1964)",
+    "imageUrl": "/img/zatanna.png"
+  },
+  {
+    "id": 26,
+    "name": "John Constantine",
+    "realName": "John Constantine",
+    "alias": "Hellblazer",
+    "alignment": "Hero",
+    "team": "Justice League Dark",
+    "powers": [
+      "Magic",
+      "Occult Knowledge",
+      "Immortality",
+      "Cunning"
+    ],
+    "origin": "Liverpool, England",
+    "firstAppearance": "Swamp Thing #37 (1985)",
+    "imageUrl": "/img/john_constantine.png"
   }
 ]
